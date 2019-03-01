@@ -33,7 +33,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    checkout(productIds: [String!]): [Product]!
+    checkout(productIds: [ID!]): [Product]!
   }
 `;
 
@@ -44,6 +44,8 @@ const resolvers = {
   },
   Mutation: {
     checkout: (parent, args, context) => {
+      cart = [];
+
       products.forEach(p => {
         args.productIds.forEach(pId => {
           if (p.id === pId) {

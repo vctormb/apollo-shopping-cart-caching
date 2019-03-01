@@ -4,17 +4,17 @@ const products = [
   {
     id: "1",
     title: "Spaceship",
-    price: "2.000"
+    price: 2.0
   },
   {
     id: "2",
     title: "Submarine",
-    price: "500"
+    price: 1.0
   },
   {
     id: "3",
     title: "Flying Saucer",
-    price: "3.500"
+    price: 3.5
   }
 ];
 
@@ -22,9 +22,9 @@ let cart = [];
 
 const typeDefs = gql`
   type Product {
-    id: String
-    title: String
-    price: Float
+    id: ID!
+    title: String!
+    price: Float!
   }
 
   type Query {
@@ -33,8 +33,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    addToCart(productIds: [String!]): [Product]!
-    removeFromCart(productId: String!): Product
+    checkout(productIds: [String!]): [Product]!
   }
 `;
 
@@ -44,7 +43,7 @@ const resolvers = {
     cart: () => cart
   },
   Mutation: {
-    addToCart: (parent, args, context) => {
+    checkout: (parent, args, context) => {
       products.forEach(p => {
         args.productIds.forEach(pId => {
           if (p.id === pId) {
@@ -60,13 +59,6 @@ const resolvers = {
       });
 
       return cart;
-    },
-    removeFromCart: (parent, args, context) => {
-      const product = cart.filter(x => x.id === args.productId)[0];
-
-      cart = cart.filter(x => x.id !== args.productId);
-
-      return product;
     }
   }
 };

@@ -13,6 +13,10 @@ import { onError } from "apollo-link-error";
 import { ApolloLink } from "apollo-link";
 import { ApolloProvider } from "react-apollo";
 
+// graphql client configuration
+import typeDefs from "./apollo/typeDefs";
+import resolvers from "./apollo/resolvers";
+
 const cache = new InMemoryCache();
 
 const client = new ApolloClient({
@@ -31,7 +35,9 @@ const client = new ApolloClient({
       credentials: "same-origin"
     })
   ]),
-  cache
+  cache,
+  typeDefs,
+  resolvers
 });
 
 cache.writeData({

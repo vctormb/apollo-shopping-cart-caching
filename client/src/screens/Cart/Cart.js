@@ -1,41 +1,54 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 // graphql
-import { Query } from "react-apollo";
+import { Query, Mutation } from "react-apollo";
 
-import { CART_CLIENT_QUERY } from "../../queries";
+import {
+  CART_CLIENT_QUERY,
+  REMOVE_FROM_CART_CLIENT
+} from "../../apollo/queries";
 
 function Cart() {
-  function removeFromCart(itemId, client) {
-    const { cart: lastCart } = client.readQuery({ query: CART_CLIENT_QUERY });
-
-    const cart = lastCart.filter(itemCart => itemCart.id !== itemId);
-
-    client.writeData({
-      data: {
-        cart
-      }
-    });
+  function calcTotal({ cart }) {
+    return cart.reduce((acc, curr) => {
+      acc = acc + curr.price;
+      return acc;
+    }, 0);
   }
 
   return (
     <Query query={CART_CLIENT_QUERY}>
-      {({ loading, data, client }) => {
+      {({ loading, data }) => {
         if (loading) return <p>Loading...</p>;
 
-        if (!data.cart.length) return <p>Empty cart :(</p>;
-
         return (
-          <ul>
-            {data.cart.map(item => (
-              <li key={item.id}>
-                <span>{item.title}</span>
-                <button onClick={() => removeFromCart(item.id, client)}>
-                  remove
-                </button>
+          <React.Fragment>
+            <ul>
+              <li>
+                <Link to="/">Go back to products</Link>
               </li>
-            ))}
-          </ul>
+
+              {!data.cart.length && <li>{<p>Empty cart :(</p>}</li>}
+
+              {data.cart.map(item => (
+                <li key={item.id}>
+                  <span>{item.title}</span>
+                  <Mutation
+                    mutation={REMOVE_FROM_CART_CLIENT}
+                    variables={{ id: item.id }}
+                  >
+                    {removeFromCartClient => (
+                      <button onClick={removeFromCartClient}>remove</button>
+                    )}
+                  </Mutation>
+                </li>
+              ))}
+              <li>
+                <strong>Total: </strong> {calcTotal(data).toFixed(3)}
+              </li>
+            </ul>
+          </React.Fragment>
         );
       }}
     </Query>

@@ -71,7 +71,9 @@ function Cart() {
 
               {data.cart.map(item => (
                 <li key={item.id}>
-                  <span>{item.title}</span>
+                  <span>
+                    {item.title} | ${item.price.toFixed(3)}
+                  </span>
                   <Mutation
                     mutation={REMOVE_FROM_CART_CLIENT}
                     variables={{ id: item.id }}
